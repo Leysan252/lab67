@@ -1,108 +1,53 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 
-namespace obj
+namespace ConsoleApp1
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
+
         {
-          ship caravel = new ship("sun",1000,"sailing");
-          ship sloop = new ship("rain",1100,"mast");
-          
-          caravel.repldisple(1300);
-          caravel.repltype("steam");
-          sloop.replname("Arizona");
-          
-          caravel.save();
-          sloop.view();
-          ship res = caravel+sloop;
-          Console.WriteLine(res.ValueDisple);
-          if (caravel>sloop)
-          {
-              Console.WriteLine("true");
-          }
-          else 
-          {
-              Console.WriteLine("False");
-          }
-        }
-    }
-    class ship
-    {
-        private string name,type;
-        uint disple;
-        public ship()
-        {
-            name = "No name";
-            disple = 0;
-            type = "No type";
-        }
-        public ship (string name,uint disple,string type)
-        {
-            this.name = name;
-            this.disple = disple;
-            this.type = type;
-        }
-       
-        public void replname(string name)
-        {
-            this.name = name;
-        }
-        public void repldisple(uint disple)
-        {
-            this.disple = disple;
-        }
-        public void repltype(string type)
-        {
-            this.type = type;
-        }
-        public string str = @"C:\Users\Zi\Desktop\прогр\лаба7\ткст файл.txt";
-        public void save()
-        {
-            using (FileStream fs = new FileStream(str,FileMode.Append))
+            string input = @"C:\Users\Zi\Desktop\прогр\прогр6.2\ткст1.txt";
+            string output = @"C:\Users\Zi\Desktop\прогр\прогр6.2\ткст2.txt";
+
+            Dictionary<string, List<string>> library = new Dictionary<string, List<string>>();
+
+            using (FileStream f = new FileStream(input, FileMode.Open)) 
             {
-                using (StreamWriter sw = new StreamWriter(fs))
+                using (StreamReader txt = new StreamReader(f)) 
+                {   
+                    string line;
+                    while ((line = txt.ReadLine()) != null) 
+                    {
+                        string[] str = line.Split(" "); // s[0] - Фамилия автора; s[1] - Жанр; s[2 - ...] - Название произведения;
+                        
+                        string name = str[0]; 
+
+                        for (int i = 2; i < str.Length; i++) name += str[i];
+
+                        if (library.ContainsKey(str[1])) 
+                        {
+                            library[str[1]].Add(name);                            
+                        }
+                        else 
+                        {
+                            library[str[1]] = new List<string> {name};
+                        }
+                    }
+                }
+            } 
+
+                using (FileStream fs = new FileStream(output, FileMode.Open)) {
+                using (StreamWriter sw = new StreamWriter(fs)) 
                 {
-                    sw.WriteLine($"name: {name}");
-                    sw.WriteLine($"disple: {disple}");
-                    sw.WriteLine($"type: {type}");
+                    foreach (KeyValuePair<string, List<string>> keyValue in library)
+                    {   
+                        sw.WriteLine($"{keyValue.Key} : {keyValue.Value.Count}");
+                    }
                 }
             }
-        }
-         public void view ()
-        {
-            Console.WriteLine($"name: {name}");
-            Console.WriteLine($"disple: {disple}");
-            Console.WriteLine($"type: {type}");
-        }
-        
-        public string ValueName
-        {
-            get {return name;}
-            set {name = value;}
-        }
-        public uint ValueDisple
-        {
-            get {return disple;}
-            set {disple = value;}
-        }
-        public string ValueType
-        {
-            get {return type;}
-            set {type= value;}
-        }
-        public  static ship operator +(ship c,ship s)
-        {
-            return new ship (c.name,c.ValueDisple + s.ValueDisple,c.type);
-        }
-        public static bool operator >(ship c, ship s )
-        {
-            return c.ValueDisple>s.ValueDisple;
-        }
-        public static bool operator <(ship c,ship s)
-        {
-            return c.ValueDisple<s.ValueDisple;
         }
     }
 }
